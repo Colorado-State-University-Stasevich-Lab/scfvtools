@@ -70,7 +70,6 @@ dependencies:
       - pluggy==1.6.0
       - pygments==2.19.2
       - pytest==9.0.1
-      - scfvtools==0.1
       - tomli==2.3.0
       - typing-extensions==4.15.0
 prefix: /home/tstasevi/miniconda3/envs/scfvtools_env

@@ -40,6 +40,20 @@ def main():
         annotation_columns = [c.strip() for c in args.annotate.split(",")]
 
 
+    # ------------------------------------------------------------
+    # Auto-create directories for user output paths
+    # ------------------------------------------------------------
+    import os
+    def ensure_parent_dir(path):
+        parent = os.path.dirname(os.path.abspath(path))
+        if parent and not os.path.exists(parent):
+            os.makedirs(parent, exist_ok=True)
+
+    # Create parent dirs for raw FASTA, aligned FASTA, and consensus FASTA
+    ensure_parent_dir(args.raw)
+    ensure_parent_dir(args.out)
+    ensure_parent_dir(args.consensus)
+
 
     # ------------------------------------------------------------
     # STEP 1: Read Excel → FASTA
@@ -143,11 +157,11 @@ def main():
     score_df = make_score_df(
         ref_csv="consensus_csv/diff_H.csv",
         name1="diff_H",
-        data_csv="aligned_output.fasta.csv",
+        data_csv="output_dir/aligned_output.fasta.csv",
         outfile="consensus_csv/scores_diff_H.csv"
     )
     show_anarci_csv("consensus_csv/scores_diff_H.csv", number=False, legend=False, region="ALL", chain="H")
-    show_anarci_csv("aligned_output.fasta.csv", number=True, legend=False, region="ALL", chain="H")
+    #show_anarci_csv("output_dir/aligned_output.fasta.csv", number=True, legend=False, region="ALL", chain="H")
 
 if __name__ == "__main__":
     main()

@@ -1,8 +1,11 @@
 setup.py
 scfvtools/__init__.py
+scfvtools/anarci_compare_utils.py
+scfvtools/anarci_diff_utils.py
 scfvtools/anarci_utils.py
 scfvtools/config.py
 scfvtools/consensus_utils.py
+scfvtools/display_utils.py
 scfvtools/io_utils.py
 scfvtools.egg-info/PKG-INFO
 scfvtools.egg-info/SOURCES.txt
