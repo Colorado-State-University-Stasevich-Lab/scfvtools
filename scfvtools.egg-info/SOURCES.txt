@@ -1,0 +1,12 @@
+setup.py
+scfvtools/__init__.py
+scfvtools/anarci_utils.py
+scfvtools/config.py
+scfvtools/consensus_utils.py
+scfvtools/io_utils.py
+scfvtools.egg-info/PKG-INFO
+scfvtools.egg-info/SOURCES.txt
+scfvtools.egg-info/dependency_links.txt
+scfvtools.egg-info/top_level.txt
+tests/test_anarci_align.py
+tests/test_read_excel_to_fasta.py
