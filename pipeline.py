@@ -4,6 +4,13 @@ import pandas as pd
 
 from scfvtools.io_utils import read_excel_to_fasta
 
+from scfvtools.anarci_diff_utils import make_diff_df
+from scfvtools.anarci_utils import anarci_to_dataframe
+from scfvtools.display_utils import show_anarci_csv  # optional
+from scfvtools.consensus_utils import build_framework_consensus
+from scfvtools.anarci_compare_utils import make_score_df
+
+
 
 
 def main():
@@ -55,93 +62,89 @@ def main():
     ensure_parent_dir(args.consensus)
 
 
-    # ------------------------------------------------------------
-    # STEP 1: Read Excel → FASTA
-    # ------------------------------------------------------------
-    print("STEP 1: Reading Excel and writing raw FASTA...")
+    # # ------------------------------------------------------------
+    # # STEP 1: Read Excel → FASTA
+    # # ------------------------------------------------------------
+    # print("STEP 1: Reading Excel and writing raw FASTA...")
 
-    records = read_excel_to_fasta(
-        excel_path=args.excel,
-        name_column=args.name,
-        sequence_column=args.seq,
-        output_fasta=args.raw,
-        contains_string=args.contains,
-        annotation_columns=annotation_columns
-    )
-    print(f"✔ Wrote {len(records)} sequences → {args.raw}")
+    # records = read_excel_to_fasta(
+    #     excel_path=args.excel,
+    #     name_column=args.name,
+    #     sequence_column=args.seq,
+    #     output_fasta=args.raw,
+    #     contains_string=args.contains,
+    #     annotation_columns=annotation_columns
+    # )
+    # print(f"✔ Wrote {len(records)} sequences → {args.raw}")
 
-    # ------------------------------------------------------------
-    # STEP 1: Build per-residue DataFrame with Region / CDR / FR
-    # ------------------------------------------------------------
-    from scfvtools.anarci_utils import anarci_to_dataframe
+    # # ------------------------------------------------------------
+    # # STEP 1: Build per-residue DataFrame with Region / CDR / FR
+    # # ------------------------------------------------------------
+    # from scfvtools.anarci_utils import anarci_to_dataframe
 
-    print("STEP 2: Creating residue-level annotation dataframe (Region, scheme, annotations)...")
-    df = anarci_to_dataframe(
-        input_fasta=args.raw,
-        scheme=args.scheme,
-    )
+    # print("STEP 2: Creating residue-level annotation dataframe (Region, scheme, annotations)...")
+    # df = anarci_to_dataframe(
+    #     input_fasta=args.raw,
+    #     scheme=args.scheme,
+    # )
 
-    # Output CSV next to aligned FASTA
-    df_out = args.out + ".csv"
-    df.to_csv(df_out, index=False)
-    print(f"✔ Annotation table written → {df_out}")
+    # # Output CSV next to aligned FASTA
+    # df_out = args.out + ".csv"
+    # df.to_csv(df_out, index=False)
+    # print(f"✔ Annotation table written → {df_out}")
 
 
-    # ------------------------------------------------------------
-    # STEP 3: Build framework consensus sequences (color-coded)
-    # ------------------------------------------------------------
-    print("\nSTEP 3: Building framework consensus sequences...")
+    # # ------------------------------------------------------------
+    # # STEP 3: Build framework consensus sequences (color-coded)
+    # # ------------------------------------------------------------
+    # print("\nSTEP 3: Building framework consensus sequences...")
 
-    from scfvtools.consensus_utils import build_framework_consensus
-    import os 
+    # import os 
 
-    # Load residue-level annotation table created in Step 2
-    df_path = args.out + ".csv"
-    if not os.path.exists(df_path):
-        raise FileNotFoundError(f"Expected annotation CSV not found: {df_path}")
+    # # Load residue-level annotation table created in Step 2
+    # df_path = args.out + ".csv"
+    # if not os.path.exists(df_path):
+    #     raise FileNotFoundError(f"Expected annotation CSV not found: {df_path}")
 
-    df = pd.read_csv(df_path)
+    # df = pd.read_csv(df_path)
 
-    # Run consensus builder (prints alignment to screen + writes CSVs)
-    _ = build_framework_consensus(
-            df,
-            threshold=args.threshold,
-            df_source=df_path
-        )
+    # # Run consensus builder (prints alignment to screen + writes CSVs)
+    # _ = build_framework_consensus(
+    #         df,
+    #         threshold=args.threshold,
+    #         df_source=df_path
+    #     )
 
-    from scfvtools.display_utils import show_anarci_csv
+    # from scfvtools.display_utils import show_anarci_csv
 
-    show_anarci_csv("consensus_csv/consensus_H_0_0.csv", number=True, legend=True, region="ALL")
-    show_anarci_csv("consensus_csv/consensus_H_1_0.csv", number=False, legend=False, region="ALL")
-    show_anarci_csv("consensus_csv/consensus_K_0_0.csv", number=False, legend=False, region="ALL")
-    show_anarci_csv("consensus_csv/consensus_K_1_0.csv", number=False, legend=False, region="ALL")
+    # show_anarci_csv("consensus_csv/consensus_H_0_0.csv", number=True, legend=True, region="ALL")
+    # show_anarci_csv("consensus_csv/consensus_H_1_0.csv", number=False, legend=False, region="ALL")
+    # show_anarci_csv("consensus_csv/consensus_K_0_0.csv", number=False, legend=False, region="ALL")
+    # show_anarci_csv("consensus_csv/consensus_K_1_0.csv", number=False, legend=False, region="ALL")
 
-    # ------------------------------------------------------------
-    # STEP 4: Compute differences between consensus groups
-    # ------------------------------------------------------------
-    print("STEP 4: Computing consensus differences...")
+    # # ------------------------------------------------------------
+    # # STEP 4: Compute differences between consensus groups
+    # # ------------------------------------------------------------
+    # print("STEP 4: Computing consensus differences...")
 
-    from scfvtools.anarci_diff_utils import make_diff_df
-    from scfvtools.display_utils import show_anarci_csv  # optional
+    # # Paths to consensus files
+    # c0_path = "consensus_csv/consensus_H_0_0.csv"
+    # c1_path = "consensus_csv/consensus_H_1_0.csv"
 
-    # Paths to consensus files
-    c0_path = "consensus_csv/consensus_H_0_0.csv"
-    c1_path = "consensus_csv/consensus_H_1_0.csv"
+    # # Load the consensus dataframes
+    # c0 = pd.read_csv(c0_path)
+    # c1 = pd.read_csv(c1_path)
 
-    # Load the consensus dataframes
-    c0 = pd.read_csv(c0_path)
-    c1 = pd.read_csv(c1_path)
+    # # Compute diff dataframe
+    # diff_df = make_diff_df(
+    #     df1=c1,
+    #     name1="consensus_H",
+    #     df2=c0,
+    #     name2="consensus_H",
+    #     outfile="consensus_csv/diff_H.csv"
+    # )
 
-    # Compute diff dataframe
-    diff_df = make_diff_df(
-        df1=c1,
-        name1="consensus_H",
-        df2=c0,
-        name2="consensus_H",
-        outfile="consensus_csv/diff_H.csv"
-    )
-
-    print("✔ Diff written → diff_H.csv\n")
+    # print("✔ Diff written → diff_H.csv\n")
 
     # OPTIONAL: display diff with color and numbering
     print("DIFF VIEW:")
@@ -152,15 +155,21 @@ def main():
     # ------------------------------------------------------------
     # STEP 5: Score sequences
     # ------------------------------------------------------------
-    from scfvtools.anarci_compare_utils import make_score_df
+
+    df = anarci_to_dataframe(
+        input_fasta="example_data/8wg16dA_MPNN_designs_chainA_only.fasta",
+        scheme="martin"
+    )
+    # Output CSV next to aligned FASTA
+    df.to_csv("output_dir/8wg16dA_MPNN_designs_chainA_only.csv", index=False)
 
     score_df = make_score_df(
         ref_csv="consensus_csv/diff_H.csv",
         name1="diff_H",
-        data_csv="output_dir/aligned_output.fasta.csv",
-        outfile="consensus_csv/scores_diff_H.csv"
+        data_csv="output_dir/8wg16dA_MPNN_designs_chainA_only.csv",
+        outfile="consensus_csv/8WG16dA.csv"
     )
-    show_anarci_csv("consensus_csv/scores_diff_H.csv", number=False, legend=False, region="ALL", chain="H")
+    show_anarci_csv("consensus_csv/8WG16dA.csv", number=False, legend=False, region="ALL", chain="H")
     #show_anarci_csv("output_dir/aligned_output.fasta.csv", number=True, legend=False, region="ALL", chain="H")
 
 if __name__ == "__main__":
