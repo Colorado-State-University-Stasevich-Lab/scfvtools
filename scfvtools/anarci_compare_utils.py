@@ -93,23 +93,29 @@ def make_score_df(ref_csv, name1, data_csv, outfile=None):
             # -------------------------------------------
             # Region propagation logic
             # -------------------------------------------
-            out_region = "DIFF0"  # default
+            out_region = "DIFF0"  # default (same AA OR neutral fallback)
 
             if ref_region == "DIFF0":
                 out_region = "DIFF0"
 
             elif ref_region.startswith("DIFF(") and ref_region.endswith(")"):
-                inside = ref_region[len("DIFF("):-1]  # extract X...Y
+                inside = ref_region[len("DIFF("):-1]  # extract XY inside DIFF(XY)
+
                 if len(inside) == 2:
                     X, Y = inside[0], inside[1]
+
                     if data_aa == X:
                         out_region = "DIFF+"
                         score_green += 1
+
                     elif data_aa == Y:
                         out_region = "DIFF-"
                         score_red += 1
+
                     else:
-                        out_region = "DIFF0"
+                        # NEW: Neither X nor Y → ambiguous → DIFF?
+                        out_region = "DIFF?"
+
                 else:
                     # malformed DIFF tag safety
                     out_region = "DIFF0"
@@ -117,6 +123,7 @@ def make_score_df(ref_csv, name1, data_csv, outfile=None):
             else:
                 # Should not occur anymore, fallback
                 out_region = "DIFF0"
+
 
             # Output AA always = DATA AA
             out_rows.append({

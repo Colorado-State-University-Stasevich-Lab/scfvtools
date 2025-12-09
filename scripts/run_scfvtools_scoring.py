@@ -66,17 +66,6 @@ def main():
         data_csv=tmp_csv
     )
 
-    # Collapse to one score per sequence name
-    summary_df = (
-        raw_df[["name", "Score"]]
-        .drop_duplicates()
-    )
-
-    # Write just the per-sequence summary
-    summary_df.to_csv(args.out_csv, index=False)
-
-    print(f"[scfvtools] Wrote per-sequence score CSV → {args.out_csv}")
-
 
 if __name__ == "__main__":
     main()
