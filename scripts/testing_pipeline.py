@@ -9,7 +9,7 @@ def main():
             "→ scoring of new sequences"
         )
     )
-
+    #Run this to test: python testing_pipeline.py --ref_csv ../output_dir/consensus_csv/diff_H.csv --name "diff_H" --data_csv ../output_dir/8wg16dA_MPNN_designs_chainA_only.csv --out ../output_dir/consensus_csv/8wg16dA_MPNN_designs_scores.csv
     parser.add_argument("--ref_csv", required=True,
                         help="Path to reference consensus CSV (e.g. diff_H.csv)")
     parser.add_argument("--name", required=True,
@@ -23,7 +23,6 @@ def main():
 
     print(f"[INFO] Running make_score_df with:")
     print(f"       ref_csv = {args.ref_csv}")
-    print(f"       name1   = {args.name}")
     print(f"       data_csv = {args.data_csv}")
     print(f"       outfile = {args.out}")
 

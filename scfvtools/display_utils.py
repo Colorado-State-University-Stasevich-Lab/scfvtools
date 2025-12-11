@@ -162,15 +162,15 @@ def html_start(outfile, title="ANARCI Alignment"):
 <title>{title}</title>
 <style>
 body {{
-    font-family: "Fira Code", "Source Code Pro", monospace;
+    font-family: "JetBrains Mono", monospace;
     white-space: pre;
     font-size: 14px;
     line-height: 1.35;   /* better spacing */
 }}
 
-.seq-res {{
-    font-weight: bold;
+.seq-line {{
 }}
+
 </style>
 </head>
 <body>
@@ -457,16 +457,17 @@ def show_anarci_html(path,
         "DIFF0": "#DDDDDD",   # light gray (very unobtrusive)
         "DIFF+": "#006400",   # dark green 
         "DIFF-": "#B22222",   # red 
-        "DIFF?": "#BBBBBB",   # gray for HTML
+        "DIFF?": "#AAAAAA",   # gray for HTML
 
     }
 
 
     def color_html(residue, region):
-        """Return <span style='color:...'>X</span>."""
-        region = str(region)
+        """Return HTML-colored residue with proper DIFF logic."""
+        
+        region = str(region).strip().upper()   # ← removes spaces and normalizes case
 
-        # direct FR colors
+        # FR regions
         if region in REGION_COLOR:
             return f"<span class='seq-res' style='color:{REGION_COLOR[region]}'>{residue}</span>"
 
@@ -475,14 +476,29 @@ def show_anarci_html(path,
         if m:
             X, Y = m.group(1), m.group(2)
             if residue == X:
-                return f"<span class='seq-res' style='color:{REGION_COLOR['DIFF+']}'>{residue}</span>"
+                return f"<span class='seq-res' style='color:{REGION_COLOR['DIFF+']}'><b>{residue}</b></span>"
             elif residue == Y:
-                return f"<span class='seq-res'8 style='color:{REGION_COLOR['DIFF-']}'>{residue}</span>"
+                return f"<span class='seq-res' style='color:{REGION_COLOR['DIFF-']}'><b>{residue}</b></span>"
             else:
                 return f"<span class='seq-res' style='color:{REGION_COLOR['DIFF0']}'>{residue}</span>"
 
-        # default
+        # CLASSIFIED DIFF
+        if region == "DIFF+":
+            return f"<span class='seq-res' style='color:{REGION_COLOR['DIFF+']}'><b>{residue}</b></span>"
+
+        if region == "DIFF-":
+            return f"<span class='seq-res' style='color:{REGION_COLOR['DIFF-']}'><b>{residue}</b></span>"
+
+        if region == "DIFF?":
+            return f"<span class='seq-res' style='color:{REGION_COLOR['DIFF?']}'>{residue}</span>"
+
+        if region == "DIFF0":
+            return f"<span class='seq-res' style='color:{REGION_COLOR['DIFF0']}'>{residue}</span>"
+
         return residue
+
+
+
 
     # ------------------------------------------------------------
     # Build numbering header (HTML version)
