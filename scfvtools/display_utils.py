@@ -166,6 +166,8 @@ body {{
     white-space: pre;
     font-size: 14px;
     line-height: 1.35;   /* better spacing */
+    
+    padding-left: 24px;  /*indent */
 }}
 
 .seq-line {{
@@ -187,7 +189,7 @@ def html_title(outfile: str, text: str):
     """Append a top-level section title (big, bold)."""
     block = f"""
 <h2 style="margin-top:24px; margin-bottom:8px; font-size:20px; font-weight:bold;">
-    {text}
+{text}
 </h2>
 """
     with open(outfile, "a", encoding="utf-8") as f:
@@ -198,7 +200,7 @@ def html_subtitle(outfile: str, text: str):
     """Append a subsection header (slightly smaller)."""
     block = f"""
 <h3 style="margin-top:16px; margin-bottom:6px; font-size:16px; font-weight:bold;">
-    {text}
+{text}
 </h3>
 """
     with open(outfile, "a", encoding="utf-8") as f:
@@ -295,7 +297,7 @@ def show_anarci_df(df,
     # ------------------------------------------------------------
     # HEADER
     # ------------------------------------------------------------
-    NAME_WIDTH =  10
+    NAME_WIDTH =  20
     CHAIN_WIDTH = 4
 
     # ------------------------------------------------------------
@@ -539,7 +541,7 @@ def show_anarci_html(path,
     ann_cols = [c for c in df.columns if c not in fixed and c not in blacklist]
 
 
-    NAME_WIDTH =  10
+    NAME_WIDTH =  20
     CHAIN_WIDTH = 4
     # ------------------------------------------------------------
     # HTML HEADER ROW (OPTIONAL)
