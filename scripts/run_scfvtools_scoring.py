@@ -20,7 +20,7 @@ def main():
     )
     parser.add_argument(
         "--reference_csv", required=True,
-        help="Reference DIFF CSV (e.g., consensus_csv/diff_H.csv)"
+        help="Reference DIFF CSV (e.g., example_data/diff_H.csv)"
     )
     parser.add_argument(
         "--reference_name", default="diff_H",
@@ -65,6 +65,74 @@ def main():
         name1=args.reference_name,
         data_csv=tmp_csv
     )
+
+
+    # ============================================================
+    # STEP 3 — Append consensus/design comparison in AF2-style
+    # ============================================================
+    try:
+        import scfvtools as scfv
+        from pathlib import Path
+
+        summary_html = Path(args.out_csv).with_suffix("").as_posix() + "_summary.html"
+
+        print(f"[scfvtools] Appending consensus/design comparison → {summary_html}")
+
+        # Open a scrolling window like the others
+        with open(summary_html, "a") as f:
+            f.write('\n<div class="seq_window" '
+                    'style="border:1px solid #bbb; padding:10px; margin:25px 0; '
+                    'max-height:450px; overflow-y:auto; background:#fafafa;">\n')
+            f.write('<h2 style="margin-top:0;">Consensus vs All Designs</h2>\n')
+
+        # Consensus directory based on reference_csv
+        ref_dir = Path(args.reference_csv).parent
+
+        # Embedded ANARCI HTML inside the window
+        scfv.show_anarci_html(
+            str(ref_dir / "consensus_H_1_0.csv"),
+            outfile=summary_html,
+            number=True, chain="H",
+            legend=True, region="ALL",
+            show_header=True
+        )
+        scfv.show_anarci_html(
+            str(ref_dir / "consensus_H_0_0.csv"),
+            outfile=summary_html,
+            number=False, chain="H",
+            legend=False, region="ALL",
+            show_header=False
+        )
+        scfv.show_anarci_html(
+            args.reference_csv,
+            outfile=summary_html,
+            number=False, chain="H",
+            legend=False, region="ALL",
+            show_header=False
+        )
+
+        # Designs block
+        with open(summary_html, "a") as f:
+            f.write('<h3>All Designs Compared to Consensus</h3>\n')
+
+        scfv.show_anarci_html(
+            tmp_csv,     # ANARCI CSV of all designs
+            outfile=summary_html,
+            number=False, chain="H",
+            legend=False, region="ALL",
+            show_header=True
+        )
+
+        # Close the window
+        with open(summary_html, "a") as f:
+            f.write("</div>\n\n")
+
+    except Exception as e:
+        print("[WARNING] Could not append consensus/design HTML block:")
+        print(e)
+
+
+
 
 
 if __name__ == "__main__":
