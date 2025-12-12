@@ -30,11 +30,13 @@ def main():
         "--out_csv", required=True,
         help="Final scfvtools score CSV (one row per sequence)"
     )
+    parser.add_argument("--summary_html", required=True)
     parser.add_argument(
         "--tmp_csv",
         help="Optional: where to write intermediate ANARCI CSV "
              "(default: derived from out_csv)"
     )
+    
 
     args = parser.parse_args()
 
@@ -90,7 +92,8 @@ def main():
         import scfvtools as scfv
         from pathlib import Path
 
-        summary_html = Path(args.out_csv).with_suffix("").as_posix() + "_summary.html"
+        summary_html = Path(args.summary_html)
+
 
         print(f"[scfvtools] Appending consensus/design comparison → {summary_html}")
 
