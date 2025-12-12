@@ -65,6 +65,9 @@ def main():
         name1=args.reference_name,
         data_csv=tmp_csv
     )
+    raw_df.to_csv(args.out_csv, index=False)
+    print(f"✔ Wrote scfvtools score CSV → {args.out_csv}")
+
 
 
     # ============================================================
