@@ -134,11 +134,6 @@ def main():
             legend=False, region="ALL",
             show_header=False
         )
-
-        # Designs block
-        with open(summary_html, "a") as f:
-            f.write('<h3>All Designs Compared to Consensus</h3>\n')
-
         scfv.show_anarci_html(
             pos_csv,
             outfile=summary_html,
