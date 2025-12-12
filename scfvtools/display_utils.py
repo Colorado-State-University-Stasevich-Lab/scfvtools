@@ -180,6 +180,43 @@ body {{
     with open(outfile, "w", encoding="utf-8") as f:
         f.write(header)
 
+
+def html_append_css_minimal(outfile):
+    """
+    Append minimal CSS rules needed for ANARCI alignment blocks.
+    Safe to use inside an existing HTML summary (does NOT add <html> or <body>).
+    Scope is limited to .anarci-block to prevent altering global formatting.
+    """
+    css = """
+<style>
+/* ============================================
+   Minimal ANARCI-safe CSS for sequence alignment
+   ============================================ */
+
+.anarci-block pre, pre.anarci-pre, code.anarci-pre {
+    font-family: "JetBrains Mono", Consolas, "Courier New", monospace !important;
+    white-space: pre !important;
+    font-size: 13px;
+    line-height: 1.15;
+}
+
+.anarci-block table, .anarci-block td {
+    font-family: "JetBrains Mono", Consolas, "Courier New", monospace !important;
+    white-space: pre !important;
+    padding: 0 4px;
+}
+
+.anarci-block {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+</style>
+"""
+    with open(outfile, "a", encoding="utf-8") as f:
+        f.write(css)
+
+
+
 def html_end(outfile):
     """Write closing HTML tags once at the end."""
     with open(outfile, "a", encoding="utf-8") as f:
