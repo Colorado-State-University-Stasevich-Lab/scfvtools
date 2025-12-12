@@ -65,74 +65,87 @@ def main():
         name1=args.reference_name,
         data_csv=tmp_csv
     )
-    raw_df.to_csv(args.out_csv, index=False)
+
+    # -------------------------------------------
+    # Convert per-position output → per-sequence scores
+    # -------------------------------------------
+
+    seq_scores = (
+        raw_df
+        .groupby("name", as_index=False)["Score"]
+        .first()                      # each seq_name has identical Score for all rows
+        .rename(columns={
+            "name": "Accession",
+            "Score": "scfvtools_score"
+        })
+    )
+    # Save per-sequence score CSV (for merging)
+    seq_scores.to_csv(args.out_csv, index=False)
     print(f"✔ Wrote scfvtools score CSV → {args.out_csv}")
 
+    # ============================================================
+    # STEP 3 — Append consensus/design comparison in AF2-style
+    # ============================================================
+    try:
+        import scfvtools as scfv
+        from pathlib import Path
 
+        summary_html = Path(args.out_csv).with_suffix("").as_posix() + "_summary.html"
 
-    # # ============================================================
-    # # STEP 3 — Append consensus/design comparison in AF2-style
-    # # ============================================================
-    # try:
-    #     import scfvtools as scfv
-    #     from pathlib import Path
+        print(f"[scfvtools] Appending consensus/design comparison → {summary_html}")
 
-    #     summary_html = Path(args.out_csv).with_suffix("").as_posix() + "_summary.html"
+        # Open a scrolling window like the others
+        with open(summary_html, "a") as f:
+            f.write('\n<div class="seq_window" '
+                    'style="border:1px solid #bbb; padding:10px; margin:25px 0; '
+                    'max-height:450px; overflow-y:auto; background:#fafafa;">\n')
+            f.write('<h2 style="margin-top:0;">Consensus vs All Designs</h2>\n')
 
-    #     print(f"[scfvtools] Appending consensus/design comparison → {summary_html}")
+        # Consensus directory based on reference_csv
+        ref_dir = Path(args.reference_csv).parent
 
-    #     # Open a scrolling window like the others
-    #     with open(summary_html, "a") as f:
-    #         f.write('\n<div class="seq_window" '
-    #                 'style="border:1px solid #bbb; padding:10px; margin:25px 0; '
-    #                 'max-height:450px; overflow-y:auto; background:#fafafa;">\n')
-    #         f.write('<h2 style="margin-top:0;">Consensus vs All Designs</h2>\n')
+        # Embedded ANARCI HTML inside the window
+        scfv.show_anarci_html(
+            str(ref_dir / "consensus_H_1_0.csv"),
+            outfile=summary_html,
+            number=True, chain="H",
+            legend=True, region="ALL",
+            show_header=True
+        )
+        scfv.show_anarci_html(
+            str(ref_dir / "consensus_H_0_0.csv"),
+            outfile=summary_html,
+            number=False, chain="H",
+            legend=False, region="ALL",
+            show_header=False
+        )
+        scfv.show_anarci_html(
+            args.reference_csv,
+            outfile=summary_html,
+            number=False, chain="H",
+            legend=False, region="ALL",
+            show_header=False
+        )
 
-    #     # Consensus directory based on reference_csv
-    #     ref_dir = Path(args.reference_csv).parent
+        # Designs block
+        with open(summary_html, "a") as f:
+            f.write('<h3>All Designs Compared to Consensus</h3>\n')
 
-    #     # Embedded ANARCI HTML inside the window
-    #     scfv.show_anarci_html(
-    #         str(ref_dir / "consensus_H_1_0.csv"),
-    #         outfile=summary_html,
-    #         number=True, chain="H",
-    #         legend=True, region="ALL",
-    #         show_header=True
-    #     )
-    #     scfv.show_anarci_html(
-    #         str(ref_dir / "consensus_H_0_0.csv"),
-    #         outfile=summary_html,
-    #         number=False, chain="H",
-    #         legend=False, region="ALL",
-    #         show_header=False
-    #     )
-    #     scfv.show_anarci_html(
-    #         args.reference_csv,
-    #         outfile=summary_html,
-    #         number=False, chain="H",
-    #         legend=False, region="ALL",
-    #         show_header=False
-    #     )
+        scfv.show_anarci_html(
+            tmp_csv,     # ANARCI CSV of all designs
+            outfile=summary_html,
+            number=False, chain="H",
+            legend=False, region="ALL",
+            show_header=True
+        )
 
-    #     # Designs block
-    #     with open(summary_html, "a") as f:
-    #         f.write('<h3>All Designs Compared to Consensus</h3>\n')
+        # Close the window
+        with open(summary_html, "a") as f:
+            f.write("</div>\n\n")
 
-    #     scfv.show_anarci_html(
-    #         tmp_csv,     # ANARCI CSV of all designs
-    #         outfile=summary_html,
-    #         number=False, chain="H",
-    #         legend=False, region="ALL",
-    #         show_header=True
-    #     )
-
-    #     # Close the window
-    #     with open(summary_html, "a") as f:
-    #         f.write("</div>\n\n")
-
-    # except Exception as e:
-    #     print("[WARNING] Could not append consensus/design HTML block:")
-    #     print(e)
+    except Exception as e:
+        print("[WARNING] Could not append consensus/design HTML block:")
+        print(e)
 
 
 
