@@ -62,10 +62,14 @@ def main():
     # STEP 2 — Score using reference DIFF CSV
     # ----------------------------------------
     # Run full scoring (per-position)
+    # Write per-position scoring output (needed for final HTML block)
+    pos_csv = args.out_csv.replace(".csv", "_per_position.csv")
+
     raw_df = make_score_df(
         ref_csv=args.reference_csv,
         name1=args.reference_name,
-        data_csv=tmp_csv
+        data_csv=tmp_csv,
+        outfile=pos_csv
     )
 
     # -------------------------------------------
@@ -135,7 +139,7 @@ def main():
             f.write('<h3>All Designs Compared to Consensus</h3>\n')
 
         scfv.show_anarci_html(
-            tmp_csv,     # ANARCI CSV of all designs
+            pos_csv,     # ANARCI CSV of all designs
             outfile=summary_html,
             number=False, chain="H",
             legend=False, region="ALL",
