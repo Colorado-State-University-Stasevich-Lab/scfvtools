@@ -78,11 +78,13 @@ def main():
 
     seq_scores = (
         raw_df
-        .groupby("name", as_index=False)["Score"]
-        .first()                      # each seq_name has identical Score for all rows
+        .groupby("name", as_index=False)[["Score", "BLOSUM SCORE", "BLOSUM DIFF SCORE"]]
+        .first()  # each is identical across rows for a given sequence
         .rename(columns={
             "name": "Accession",
-            "Score": "scfvtools_score"
+            "Score": "scfvtools_score",
+            "BLOSUM SCORE": "scfvtools_blosum_score",
+            "BLOSUM DIFF SCORE": "scfvtools_blosum_diff_score",
         })
     )
     # Save per-sequence score CSV (for merging)
