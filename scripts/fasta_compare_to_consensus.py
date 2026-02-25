@@ -56,11 +56,19 @@ def main():
     parser.add_argument("--contains", required=False, default=None,
                         help="Optional substring filter to include only rows containing this string")
 
-    # Output options (optional now)
+    # Output options
     parser.add_argument("--out", required=False,
                         help="Output CSV path for scored sequences")
     parser.add_argument("--raw", required=False,
                         help="Raw FASTA output when converting Excel → FASTA")
+
+    # ------------------------------------------------------------
+    # NEW: BLOSUM behavior controls
+    # ------------------------------------------------------------
+    parser.add_argument("--gap_penalty", type=float, default=-1.0,
+                        help="Penalty applied to gaps/missing residues (default: -1.0)")
+    parser.add_argument("--unknown_penalty", type=float, default=-1.0,
+                        help="Penalty applied to non-standard amino acids (default: -1.0)")
 
     args = parser.parse_args()
 
@@ -70,7 +78,6 @@ def main():
     if args.excel is not None:
         print("STEP 1: Reading Excel and writing FASTA...")
 
-        # Auto-generate names if not provided
         raw_default, out_default = auto_names_from_excel(args.excel)
 
         if args.raw is None:
@@ -103,19 +110,20 @@ def main():
 
         fasta_path = args.data_fasta
 
-        # Auto-name OUT if missing
         if args.out is None:
             args.out = auto_names_from_fasta(args.data_fasta)
             print(f"[AUTO] Using OUT file: {args.out}")
 
     # ============================================================
-    # Continue with your original workflow
+    # Continue workflow
     # ============================================================
     print(f"[INFO] Running make_score_df with:")
-    print(f"       ref_csv     = {args.ref_csv}")
-    print(f"       consensus   = {args.name}")
-    print(f"       data_fasta  = {fasta_path}")
-    print(f"       outfile     = {args.out}")
+    print(f"       ref_csv        = {args.ref_csv}")
+    print(f"       consensus      = {args.name}")
+    print(f"       data_fasta     = {fasta_path}")
+    print(f"       outfile        = {args.out}")
+    print(f"       gap_penalty    = {args.gap_penalty}")
+    print(f"       unknown_penalty= {args.unknown_penalty}")
 
     # ------------------------------------------------------------
     # STEP: FASTA → ANARCI CSV
@@ -136,7 +144,9 @@ def main():
         ref_csv=args.ref_csv,
         name1=args.name,
         data_csv=outfile_csv,
-        outfile=args.out
+        outfile=args.out,
+        gap_penalty=args.gap_penalty,
+        unknown_penalty=args.unknown_penalty,
     )
 
     print(f"[INFO] Score dataframe written to: {args.out}")
@@ -150,39 +160,43 @@ def main():
     scfv.html_start(outfile_html, title="ANARCI Comparison")
     scfv.html_title(outfile_html, "ANARCI Comparison Results")
 
-    # Consensus
     scfv.html_subtitle(outfile_html, "Consensus Heavy-Chain Sequences")
+
     scfv.show_anarci_html("../example_data/consensus_H_1_0.csv",
-                        outfile=outfile_html, number=True, chain="H",
-                        legend=True, region="ALL", show_header=True)
+                          outfile=outfile_html, number=True, chain="H",
+                          legend=True, region="ALL", show_header=True)
 
     scfv.show_anarci_html("../example_data/consensus_H_0_0.csv",
-                        outfile=outfile_html, number=False, chain="H",
-                        legend=False, region="ALL", show_header=False)
+                          outfile=outfile_html, number=False, chain="H",
+                          legend=False, region="ALL", show_header=False)
 
     scfv.show_anarci_html("../example_data/diff_H.csv",
-                        outfile=outfile_html, number=False, chain="H",
-                        legend=False, region="ALL", show_header=False)
+                          outfile=outfile_html, number=False, chain="H",
+                          legend=False, region="ALL", show_header=False)
 
-
-    # Final scored designs
     scfv.show_anarci_html(args.out,
-                          outfile=outfile_html, number=False, chain="H", legend=False, region="ALL", show_header=True)
+                          outfile=outfile_html, number=False,
+                          chain="H", legend=False, region="ALL",
+                          show_header=True)
 
     scfv.html_end(outfile_html)
 
     # Terminal output versions
     scfv.show_anarci_csv("../example_data/consensus_H_1_0.csv",
-                        number=True, chain="H", legend=True, region="ALL", show_header=True)
+                         number=True, chain="H", legend=True,
+                         region="ALL", show_header=True)
 
     scfv.show_anarci_csv("../example_data/consensus_H_0_0.csv",
-                        number=False, chain="H", legend=False, region="ALL", show_header=False)
+                         number=False, chain="H", legend=False,
+                         region="ALL", show_header=False)
 
     scfv.show_anarci_csv("../example_data/diff_H.csv",
-                        number=False, chain="H", legend=False, region="ALL", show_header=False)
+                         number=False, chain="H", legend=False,
+                         region="ALL", show_header=False)
 
     scfv.show_anarci_csv(args.out,
-                         number=False, chain="H", legend=False, region="ALL", show_header=True)
+                         number=False, chain="H", legend=False,
+                         region="ALL", show_header=True)
 
 
 if __name__ == "__main__":
