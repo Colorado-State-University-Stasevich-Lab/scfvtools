@@ -1,0 +1,6 @@
+name,position,chain,aa,Region,scheme,seq1,seq2
+diff_H,9,H,D,DIFF(D-),martin,D,-
+diff_H,12,H,V,DIFF(-V),martin,-,V
+diff_H,17,H,T,DIFF(TS),martin,T,S
+diff_H,21,H,S,DIFF(-S),martin,-,S
+diff_H,27,H,F,DIFF(F-),martin,F,-
